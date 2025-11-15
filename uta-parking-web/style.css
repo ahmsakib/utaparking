@@ -1,0 +1,269 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #0039A6;
+}
+
+.screen {
+    min-height: 100vh;
+    display: none;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Login Screen */
+.login-screen {
+    background: #0039A6;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.uta-logo {
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.uta-logo-text {
+    font-size: 32px;
+    font-weight: bold;
+    color: #0039A6;
+}
+
+.login-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.login-form {
+    width: 100%;
+    max-width: 300px;
+}
+
+.input {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    color: #666;
+}
+
+.login-button {
+    background: #FF6B35;
+    color: white;
+    border: none;
+    padding: 18px;
+    border-radius: 10px;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    background: #e55a2b;
+}
+
+.demo-text {
+    margin-top: 30px;
+    opacity: 0.8;
+}
+
+/* Map Screen */
+.map-screen {
+    background: #f8f9fa;
+}
+
+.header {
+    background: #0039A6;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.header-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.header-subtitle {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+.map-container {
+    flex: 1;
+    padding: 20px;
+}
+
+.parking-lot {
+    padding: 25px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.parking-lot:hover {
+    transform: translateY(-2px);
+}
+
+.lot-name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.lot-spaces {
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+.legend {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #eee;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.legend-text {
+    font-size: 12px;
+    color: #333;
+}
+
+.demo-controls {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #eee;
+}
+
+.demo-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+    text-align: center;
+}
+
+.scenario-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.scenario-button {
+    flex: 1;
+    padding: 12px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+}
+
+.scenario-button:hover {
+    background: #e0e0e0;
+}
+
+.scenario-button.active {
+    background: #0039A6;
+    color: white;
+}
+
+/* Details Screen */
+.details-screen {
+    background: #f8f9fa;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.details-container {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.space-count {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.space-number {
+    font-size: 80px;
+    font-weight: bold;
+    color: #0039A6;
+}
+
+.space-label {
+    font-size: 20px;
+    color: #666;
+    margin-top: 10px;
+}
+
+.space-total {
+    font-size: 14px;
+    color: #999;
+    margin-top: 5px;
+}
+
+.navigate-button {
+    background: #0039A6;
+    color: white;
+    border: none;
+    padding: 18px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 200px;
+}
+
+.navigate-button:hover {
+    background: #002a7a;
+}
