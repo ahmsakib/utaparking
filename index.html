@@ -3,13 +3,1408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UTA Parking App</title>
-    <link rel="stylesheet" href="style.css">
+    <title>NoCircles - Smart Campus Parking</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary: #2E7D32;
+            --primary-light: #4CAF50;
+            --primary-dark: #1B5E20;
+            --secondary: #FFC107;
+            --danger: #F44336;
+            --gray-light: #f5f5f5;
+            --gray: #9E9E9E;
+            --gray-dark: #424242;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray-light);
+            color: var(--gray-dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: var(--white);
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .user-profile {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            background-color: var(--white);
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Map Section */
+        .map-container {
+            background-color: var(--gray-light);
+            height: 300px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #parkingMap {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        .map-legend {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: flex;
+            gap: 10px;
+            z-index: 500;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .legend-green {
+            background-color: var(--primary-light);
+        }
+        
+        .legend-yellow {
+            background-color: var(--secondary);
+        }
+        
+        .legend-red {
+            background-color: var(--danger);
+        }
+        
+        /* Parking Lots List */
+        .parking-lots {
+            margin-bottom: 20px;
+        }
+        
+        .lot-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lot-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .lot-card.yellow {
+            border-left-color: var(--secondary);
+        }
+        
+        .lot-card.red {
+            border-left-color: var(--danger);
+        }
+        
+        .lot-info h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .lot-info p {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .lot-status {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+        
+        .status-green {
+            background-color: var(--primary-light);
+        }
+        
+        .status-yellow {
+            background-color: var(--secondary);
+        }
+        
+        .status-red {
+            background-color: var(--danger);
+        }
+        
+        .status-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray-light);
+            color: var(--gray-dark);
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        /* Filters */
+        .filters {
+            margin-bottom: 20px;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .filter-chip {
+            padding: 8px 12px;
+            background-color: var(--gray-light);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-chip.active {
+            background-color: var(--primary-light);
+            color: var(--white);
+        }
+        
+        /* Predictions */
+        .predictions {
+            background-color: var(--gray-light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .prediction-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .prediction-time {
+            font-weight: 500;
+        }
+        
+        .prediction-status {
+            font-size: 0.85rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background-color: var(--secondary);
+            color: var(--gray-dark);
+        }
+        
+        /* Leaderboard */
+        .leaderboard {
+            margin-bottom: 20px;
+        }
+        
+        .leader-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .leader-rank {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+        
+        .leader-info {
+            flex: 1;
+        }
+        
+        .leader-name {
+            font-weight: 500;
+        }
+        
+        .leader-points {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .leader-score {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-icon.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon i {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: var(--white);
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-10 {
+            margin-top: 10px;
+        }
+        
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+        
+        /* Map Popup Styles */
+        .leaflet-popup-content {
+            margin: 10px 15px;
+        }
+        
+        .popup-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .popup-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .popup-status.green {
+            background-color: var(--primary-light);
+        }
+        
+        .popup-status.yellow {
+            background-color: var(--secondary);
+        }
+        
+        .popup-status.red {
+            background-color: var(--danger);
+        }
+        
+        .popup-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .popup-btn {
+            flex: 1;
+            padding: 5px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .popup-btn.primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .popup-btn.secondary {
+            background-color: var(--gray-light);
+            color: var(--gray-dark);
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Screens will be loaded here by JavaScript -->
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <div class="logo-icon">NC</div>
+                <h1>NoCircles</h1>
+            </div>
+            <div class="user-profile" id="userProfile">JS</div>
+        </header>
+        
+        <!-- Navigation -->
+        <nav>
+            <div class="nav-item active" data-tab="map">Map</div>
+            <div class="nav-item" data-tab="lots">Lots</div>
+            <div class="nav-item" data-tab="predictions">Predictions</div>
+            <div class="nav-item" data-tab="community">Community</div>
+        </nav>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Map Section -->
+            <div class="tab-content active" id="map-tab">
+                <div class="map-container">
+                    <div id="parkingMap"></div>
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <div class="legend-color legend-green"></div>
+                            <span>Many Spaces</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-yellow"></div>
+                            <span>Almost Full</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-red"></div>
+                            <span>Full</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="carInBtn">
+                        <i>🚗</i> Car In
+                    </button>
+                    <button class="btn btn-secondary" id="carOutBtn">
+                        <i>⬅️</i> Car Out
+                    </button>
+                </div>
+                
+                <!-- Filters -->
+                <div class="filters">
+                    <h2 class="section-title">Filters</h2>
+                    <div class="filter-options">
+                        <div class="filter-chip active" data-filter="all">All Lots</div>
+                        <div class="filter-chip" data-filter="ev">EV Charging</div>
+                        <div class="filter-chip" data-filter="accessible">Accessible</div>
+                        <div class="filter-chip" data-filter="permit-a">Permit A</div>
+                        <div class="filter-chip" data-filter="permit-b">Permit B</div>
+                    </div>
+                </div>
+                
+                <!-- Parking Lots List -->
+                <div class="parking-lots">
+                    <h2 class="section-title">Parking Lots</h2>
+                    <div id="lotsList">
+                        <!-- Lots will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Predictions Tab -->
+            <div class="tab-content" id="predictions-tab">
+                <div class="predictions">
+                    <h2 class="section-title">AI Predictions</h2>
+                    
+                    <div class="prediction-item">
+                        <div class="prediction-time">Next 30 mins</div>
+                        <div class="prediction-status">West Garage filling up</div>
+                    </div>
+                    
+                    <div class="prediction-item">
+                        <div class="prediction-time">Next hour</div>
+                        <div class="prediction-status">North Lawn will be full</div>
+                    </div>
+                    
+                    <div class="prediction-item">
+                        <div class="prediction-time">This afternoon</div>
+                        <div class="prediction-status">East Lot stays available</div>
+                    </div>
+                </div>
+                
+                <div class="section-title">
+                    <h2>Parking Trends</h2>
+                </div>
+                
+                <div id="trendChart" style="height: 200px; background-color: #f9f9f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <p>Parking availability chart will appear here</p>
+                </div>
+            </div>
+            
+            <!-- Community Tab -->
+            <div class="tab-content" id="community-tab">
+                <!-- Leaderboard -->
+                <div class="leaderboard">
+                    <h2 class="section-title">
+                        Community Leaderboard
+                        <span style="font-size: 0.9rem; font-weight: normal;">Your rank: <span id="userRank">#12</span></span>
+                    </h2>
+                    
+                    <div id="leaderboardList">
+                        <!-- Leaderboard will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="section-title">
+                    <h2>Your Contributions</h2>
+                </div>
+                
+                <div style="background-color: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-size: 0.9rem; color: var(--gray);">Reports This Month</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);" id="userReports">24</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.9rem; color: var(--gray);">Total Points</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);" id="userPoints">120</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--gray); text-align: center;">
+                        Keep reporting to earn rewards and help the community!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-icon active" data-tab="map">
+                <i>🗺️</i>
+                <span>Map</span>
+            </div>
+            <div class="nav-icon" data-tab="predictions">
+                <i>📊</i>
+                <span>Predict</span>
+            </div>
+            <div class="nav-icon" data-tab="community">
+                <i>🏆</i>
+                <span>Rank</span>
+            </div>
+            <div class="nav-icon" data-tab="settings">
+                <i>⚙️</i>
+                <span>Settings</span>
+            </div>
+        </div>
     </div>
-    <script src="script.js"></script>
+    
+    <!-- Car In Modal -->
+    <div class="modal" id="carInModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Report Parking</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Select Parking Lot</label>
+                    <select class="form-select" id="carInLotSelect">
+                        <option value="">-- Select a lot --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Spot Type (Optional)</label>
+                    <select class="form-select" id="spotTypeSelect">
+                        <option value="regular">Regular</option>
+                        <option value="ev">EV Charging</option>
+                        <option value="accessible">Accessible</option>
+                        <option value="faculty">Faculty/Staff</option>
+                    </select>
+                </div>
+                <p class="text-center mt-10">Your location will be verified to ensure accuracy.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <button class="btn btn-primary" id="confirmCarIn">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Car Out Modal -->
+    <div class="modal" id="carOutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Leaving Parking</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you leaving your parking spot?</p>
+                <p class="mb-10">This will update the availability for other students.</p>
+                <div class="form-group">
+                    <label class="form-label">Parking Lot</label>
+                    <select class="form-select" id="carOutLotSelect">
+                        <option value="">-- Select a lot --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <button class="btn btn-primary" id="confirmCarOut">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Thank You!</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <p id="confirmationMessage">Your report has been submitted.</p>
+                <p id="pointsEarned">+5 points added to your account!</p>
+                <p class="mt-10">You've helped make parking better for everyone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary close-modal">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText">Notification message</span>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Parking lot data
+        const parkingLots = [
+            {
+                id: 1,
+                name: "West Campus Garage",
+                lat: 32.7310,
+                lng: -97.1150,
+                status: "green",
+                available: 25,
+                total: 100,
+                distance: "0.3 miles",
+                walkTime: "5 min walk",
+                filters: ["all", "permit-a"],
+                prediction: "Filling up in 30 mins"
+            },
+            {
+                id: 2,
+                name: "North Lawn Lot",
+                lat: 32.7330,
+                lng: -97.1120,
+                status: "yellow",
+                available: 5,
+                total: 50,
+                distance: "0.5 miles",
+                walkTime: "8 min walk",
+                filters: ["all", "permit-b"],
+                prediction: "Will be full in 1 hour"
+            },
+            {
+                id: 3,
+                name: "Central Plaza Garage",
+                lat: 32.7290,
+                lng: -97.1100,
+                status: "red",
+                available: 0,
+                total: 80,
+                distance: "0.2 miles",
+                walkTime: "4 min walk",
+                filters: ["all", "permit-a"],
+                prediction: "Stays full until 3 PM"
+            },
+            {
+                id: 4,
+                name: "East Campus Lot",
+                lat: 32.7300,
+                lng: -97.1050,
+                status: "green",
+                available: 15,
+                total: 60,
+                distance: "0.7 miles",
+                walkTime: "12 min walk",
+                filters: ["all", "permit-b", "ev"],
+                prediction: "Stays available all day"
+            },
+            {
+                id: 5,
+                name: "Maverick Activity Center",
+                lat: 32.7350,
+                lng: -97.1080,
+                status: "green",
+                available: 30,
+                total: 120,
+                distance: "0.4 miles",
+                walkTime: "7 min walk",
+                filters: ["all", "accessible"],
+                prediction: "Gradually fills by noon"
+            }
+        ];
+
+        // Leaderboard data
+        const leaderboardData = [
+            { name: "Sarah M.", reports: 245, points: 1250 },
+            { name: "Alex J.", reports: 198, points: 990 },
+            { name: "Michael T.", reports: 176, points: 880 },
+            { name: "Jessica L.", reports: 162, points: 810 },
+            { name: "David K.", reports: 150, points: 750 }
+        ];
+
+        // User data
+        let userData = {
+            name: "John Smith",
+            reports: 24,
+            points: 120,
+            rank: 12
+        };
+
+        // Global variables
+        let map;
+        let markers = [];
+        let currentFilter = "all";
+        let userLocation = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            initEventListeners();
+            renderParkingLots();
+            renderLeaderboard();
+            updateUserStats();
+        });
+
+        // Initialize the map
+        function initMap() {
+            // Set initial view to UTA campus
+            map = L.map('parkingMap').setView([32.7290, -97.1120], 15);
+            
+            // Add tile layer (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add parking lot markers
+            parkingLots.forEach(lot => {
+                const marker = L.marker([lot.lat, lot.lng])
+                    .addTo(map)
+                    .bindPopup(createPopupContent(lot));
+                
+                markers.push({
+                    id: lot.id,
+                    marker: marker,
+                    lot: lot
+                });
+            });
+            
+            // Try to get user's location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        userLocation = [position.coords.latitude, position.coords.longitude];
+                        // Add user location marker
+                        L.marker(userLocation)
+                            .addTo(map)
+                            .bindPopup("Your Location")
+                            .openPopup();
+                            
+                        // Center map on user location
+                        map.setView(userLocation, 16);
+                        
+                        showNotification("Location detected! Showing lots near you.");
+                    },
+                    error => {
+                        console.log("Geolocation error:", error);
+                        showNotification("Using default location. Enable location for better accuracy.");
+                    }
+                );
+            }
+        }
+
+        // Create popup content for markers
+        function createPopupContent(lot) {
+            let statusClass = "";
+            let statusText = "";
+            
+            if (lot.status === "green") {
+                statusClass = "green";
+                statusText = `${lot.available}+ spots available`;
+            } else if (lot.status === "yellow") {
+                statusClass = "yellow";
+                statusText = `Only ${lot.available} spots left`;
+            } else {
+                statusClass = "red";
+                statusText = "Full";
+            }
+            
+            return `
+                <div class="popup-title">${lot.name}</div>
+                <div class="popup-status ${statusClass}">${statusText}</div>
+                <div>${lot.distance} • ${lot.walkTime}</div>
+                <div class="popup-actions">
+                    <button class="popup-btn primary" onclick="reportCarIn(${lot.id})">Car In</button>
+                    <button class="popup-btn secondary" onclick="reportCarOut(${lot.id})">Car Out</button>
+                </div>
+            `;
+        }
+
+        // Initialize event listeners
+        function initEventListeners() {
+            // Navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            const bottomNavIcons = document.querySelectorAll('.nav-icon');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    switchTab(tab);
+                    
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            bottomNavIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    if (tab === "settings") {
+                        showNotification("Settings feature coming soon!");
+                        return;
+                    }
+                    
+                    switchTab(tab);
+                    
+                    bottomNavIcons.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update top nav
+                    navItems.forEach(i => {
+                        if (i.getAttribute('data-tab') === tab) {
+                            i.classList.add('active');
+                        } else {
+                            i.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            // Filter chips
+            const filterChips = document.querySelectorAll('.filter-chip');
+            
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    filterChips.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentFilter = filter;
+                    filterParkingLots();
+                });
+            });
+            
+            // Modal functionality
+            const carInModal = document.getElementById('carInModal');
+            const carOutModal = document.getElementById('carOutModal');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const carInBtn = document.getElementById('carInBtn');
+            const carOutBtn = document.getElementById('carOutBtn');
+            const confirmCarIn = document.getElementById('confirmCarIn');
+            const confirmCarOut = document.getElementById('confirmCarOut');
+            const closeButtons = document.querySelectorAll('.close-modal');
+            
+            // Populate lot select options
+            const carInLotSelect = document.getElementById('carInLotSelect');
+            const carOutLotSelect = document.getElementById('carOutLotSelect');
+            
+            parkingLots.forEach(lot => {
+                const optionIn = document.createElement('option');
+                optionIn.value = lot.id;
+                optionIn.textContent = lot.name;
+                carInLotSelect.appendChild(optionIn);
+                
+                const optionOut = document.createElement('option');
+                optionOut.value = lot.id;
+                optionOut.textContent = lot.name;
+                carOutLotSelect.appendChild(optionOut);
+            });
+            
+            // Open Car In modal
+            carInBtn.addEventListener('click', function() {
+                carInModal.style.display = 'flex';
+            });
+            
+            // Open Car Out modal
+            carOutBtn.addEventListener('click', function() {
+                carOutModal.style.display = 'flex';
+            });
+            
+            // Confirm Car In
+            confirmCarIn.addEventListener('click', function() {
+                const selectedLotId = parseInt(carInLotSelect.value);
+                const spotType = document.getElementById('spotTypeSelect').value;
+                
+                if (!selectedLotId) {
+                    showNotification("Please select a parking lot");
+                    return;
+                }
+                
+                carInModal.style.display = 'none';
+                reportCarIn(selectedLotId, spotType);
+            });
+            
+            // Confirm Car Out
+            confirmCarOut.addEventListener('click', function() {
+                const selectedLotId = parseInt(carOutLotSelect.value);
+                
+                if (!selectedLotId) {
+                    showNotification("Please select a parking lot");
+                    return;
+                }
+                
+                carOutModal.style.display = 'none';
+                reportCarOut(selectedLotId);
+            });
+            
+            // Close modals
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    carInModal.style.display = 'none';
+                    carOutModal.style.display = 'none';
+                    confirmationModal.style.display = 'none';
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === carInModal) {
+                    carInModal.style.display = 'none';
+                }
+                if (event.target === carOutModal) {
+                    carOutModal.style.display = 'none';
+                }
+                if (event.target === confirmationModal) {
+                    confirmationModal.style.display = 'none';
+                }
+            });
+            
+            // User profile click
+            document.getElementById('userProfile').addEventListener('click', function() {
+                showNotification(`Logged in as ${userData.name}`);
+            });
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabContents.forEach(tab => {
+                if (tab.id === `${tabName}-tab`) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Special handling for map tab
+            if (tabName === 'map' && map) {
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 300);
+            }
+        }
+
+        // Render parking lots list
+        function renderParkingLots() {
+            const lotsList = document.getElementById('lotsList');
+            lotsList.innerHTML = '';
+            
+            const filteredLots = parkingLots.filter(lot => 
+                currentFilter === "all" || lot.filters.includes(currentFilter)
+            );
+            
+            filteredLots.forEach(lot => {
+                const lotCard = document.createElement('div');
+                lotCard.className = `lot-card ${lot.status}`;
+                lotCard.setAttribute('data-lot-id', lot.id);
+                
+                let statusText = "";
+                if (lot.status === "green") {
+                    statusText = `${lot.available}+ spots`;
+                } else if (lot.status === "yellow") {
+                    statusText = `${lot.available} spots`;
+                } else {
+                    statusText = "Full";
+                }
+                
+                lotCard.innerHTML = `
+                    <div class="lot-info">
+                        <h3>${lot.name}</h3>
+                        <p>${lot.distance} • ${lot.walkTime}</p>
+                    </div>
+                    <div class="lot-status">
+                        <div class="status-indicator status-${lot.status}"></div>
+                        <span class="status-text">${statusText}</span>
+                    </div>
+                `;
+                
+                lotCard.addEventListener('click', function() {
+                    const lotId = parseInt(this.getAttribute('data-lot-id'));
+                    const lot = parkingLots.find(l => l.id === lotId);
+                    
+                    if (lot) {
+                        // Center map on this lot
+                        map.setView([lot.lat, lot.lng], 16);
+                        
+                        // Open popup for this lot's marker
+                        const markerObj = markers.find(m => m.id === lotId);
+                        if (markerObj) {
+                            markerObj.marker.openPopup();
+                        }
+                    }
+                });
+                
+                lotsList.appendChild(lotCard);
+            });
+        }
+
+        // Filter parking lots based on current filter
+        function filterParkingLots() {
+            // Update map markers
+            markers.forEach(markerObj => {
+                const lot = markerObj.lot;
+                if (currentFilter === "all" || lot.filters.includes(currentFilter)) {
+                    markerObj.marker.addTo(map);
+                } else {
+                    map.removeLayer(markerObj.marker);
+                }
+            });
+            
+            // Update list
+            renderParkingLots();
+        }
+
+        // Render leaderboard
+        function renderLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = '';
+            
+            leaderboardData.forEach((user, index) => {
+                const leaderItem = document.createElement('div');
+                leaderItem.className = 'leader-item';
+                
+                leaderItem.innerHTML = `
+                    <div class="leader-rank">${index + 1}</div>
+                    <div class="leader-info">
+                        <div class="leader-name">${user.name}</div>
+                        <div class="leader-points">${user.reports} reports this month</div>
+                    </div>
+                    <div class="leader-score">${user.points} pts</div>
+                `;
+                
+                leaderboardList.appendChild(leaderItem);
+            });
+        }
+
+        // Update user statistics
+        function updateUserStats() {
+            document.getElementById('userRank').textContent = `#${userData.rank}`;
+            document.getElementById('userReports').textContent = userData.reports;
+            document.getElementById('userPoints').textContent = userData.points;
+        }
+
+        // Report car in
+        function reportCarIn(lotId, spotType = "regular") {
+            const lot = parkingLots.find(l => l.id === lotId);
+            if (!lot) return;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Update lot availability (simulate)
+                if (lot.status !== "red") {
+                    if (lot.available > 0) {
+                        lot.available--;
+                        
+                        // Update status if needed
+                        if (lot.available <= 5 && lot.available > 0) {
+                            lot.status = "yellow";
+                        } else if (lot.available === 0) {
+                            lot.status = "red";
+                        }
+                    }
+                }
+                
+                // Update user data
+                userData.reports++;
+                userData.points += 5;
+                
+                // Update UI
+                updateUserStats();
+                renderParkingLots();
+                updateMarkers();
+                
+                // Show confirmation
+                document.getElementById('confirmationMessage').textContent = 
+                    `You've reported parking at ${lot.name}.`;
+                document.getElementById('pointsEarned').textContent = 
+                    `+5 points added to your account!`;
+                document.getElementById('confirmationModal').style.display = 'flex';
+                
+                showNotification(`Reported parking at ${lot.name}`);
+            }, 1000);
+        }
+
+        // Report car out
+        function reportCarOut(lotId) {
+            const lot = parkingLots.find(l => l.id === lotId);
+            if (!lot) return;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Update lot availability (simulate)
+                if (lot.available < lot.total) {
+                    lot.available++;
+                    
+                    // Update status if needed
+                    if (lot.status === "red" && lot.available > 0) {
+                        lot.status = "yellow";
+                    } else if (lot.status === "yellow" && lot.available > 5) {
+                        lot.status = "green";
+                    }
+                }
+                
+                // Update user data
+                userData.reports++;
+                userData.points += 5;
+                
+                // Update UI
+                updateUserStats();
+                renderParkingLots();
+                updateMarkers();
+                
+                // Show confirmation
+                document.getElementById('confirmationMessage').textContent = 
+                    `You've reported leaving ${lot.name}.`;
+                document.getElementById('pointsEarned').textContent = 
+                    `+5 points added to your account!`;
+                document.getElementById('confirmationModal').style.display = 'flex';
+                
+                showNotification(`Reported leaving ${lot.name}`);
+            }, 1000);
+        }
+
+        // Update map markers
+        function updateMarkers() {
+            markers.forEach(markerObj => {
+                const lot = markerObj.lot;
+                markerObj.marker.setPopupContent(createPopupContent(lot));
+            });
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
