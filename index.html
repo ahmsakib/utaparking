@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoCircles - Smart Campus Parking</title>
+    <title>NoCircles - UTA Smart Parking</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
         :root {
-            --primary: #2E7D32;
-            --primary-light: #4CAF50;
-            --primary-dark: #1B5E20;
-            --secondary: #FFC107;
-            --danger: #F44336;
-            --gray-light: #f5f5f5;
+            --uta-blue: #1C3D6A;
+            --uta-orange: #D64330;
+            --uta-light-blue: #4A7BC4;
+            --uta-light-gray: #F2F2F2;
+            --uta-dark-gray: #333333;
+            --primary: var(--uta-blue);
+            --primary-light: var(--uta-light-blue);
+            --secondary: var(--uta-orange);
+            --gray-light: var(--uta-light-gray);
             --gray: #9E9E9E;
-            --gray-dark: #424242;
+            --gray-dark: var(--uta-dark-gray);
             --white: #ffffff;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
         }
         
         * {
@@ -38,11 +44,124 @@
             min-height: 100vh;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Login Page Styles */
+        #loginPage {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+            color: white;
+            text-align: center;
+        }
+        
+        .login-header {
+            margin-bottom: 40px;
+        }
+        
+        .uta-logo {
+            width: 120px;
+            height: 120px;
+            background-color: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .login-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .login-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .login-form {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-light);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 123, 196, 0.2);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(214, 67, 48, 0.4);
+        }
+        
+        .login-footer {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .login-footer a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        /* App Styles */
+        #appPage {
+            display: none;
         }
         
         /* Header Styles */
         header {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: var(--white);
             padding: 15px 20px;
             display: flex;
@@ -80,7 +199,7 @@
             width: 35px;
             height: 35px;
             border-radius: 50%;
-            background-color: var(--primary-light);
+            background-color: var(--secondary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -120,7 +239,7 @@
         .section-title {
             font-size: 1.2rem;
             margin-bottom: 15px;
-            color: var(--primary-dark);
+            color: var(--primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -168,11 +287,11 @@
         }
         
         .legend-green {
-            background-color: var(--primary-light);
+            background-color: var(--success);
         }
         
         .legend-yellow {
-            background-color: var(--secondary);
+            background-color: var(--warning);
         }
         
         .legend-red {
@@ -190,7 +309,7 @@
             padding: 15px;
             margin-bottom: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-left: 4px solid var(--primary-light);
+            border-left: 4px solid var(--success);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -204,7 +323,7 @@
         }
         
         .lot-card.yellow {
-            border-left-color: var(--secondary);
+            border-left-color: var(--warning);
         }
         
         .lot-card.red {
@@ -235,11 +354,11 @@
         }
         
         .status-green {
-            background-color: var(--primary-light);
+            background-color: var(--success);
         }
         
         .status-yellow {
-            background-color: var(--secondary);
+            background-color: var(--warning);
         }
         
         .status-red {
@@ -278,8 +397,8 @@
         }
         
         .btn-secondary {
-            background-color: var(--gray-light);
-            color: var(--gray-dark);
+            background-color: var(--secondary);
+            color: var(--white);
         }
         
         .btn:hover {
@@ -311,7 +430,7 @@
         }
         
         .filter-chip.active {
-            background-color: var(--primary-light);
+            background-color: var(--primary);
             color: var(--white);
         }
         
@@ -345,7 +464,7 @@
             font-size: 0.85rem;
             padding: 3px 8px;
             border-radius: 12px;
-            background-color: var(--secondary);
+            background-color: var(--warning);
             color: var(--gray-dark);
         }
         
@@ -551,11 +670,11 @@
         }
         
         .popup-status.green {
-            background-color: var(--primary-light);
+            background-color: var(--success);
         }
         
         .popup-status.yellow {
-            background-color: var(--secondary);
+            background-color: var(--warning);
         }
         
         .popup-status.red {
@@ -583,8 +702,8 @@
         }
         
         .popup-btn.secondary {
-            background-color: var(--gray-light);
-            color: var(--gray-dark);
+            background-color: var(--secondary);
+            color: white;
         }
         
         /* Notification */
@@ -623,10 +742,64 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Demo Credentials */
+        .demo-credentials {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .demo-credentials h3 {
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .demo-credentials p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Login Page -->
+    <div class="container" id="loginPage">
+        <div class="login-header">
+            <div class="uta-logo">UTA</div>
+            <h1>NoCircles</h1>
+            <p>Smart Parking for UTA Students</p>
+        </div>
+        
+        <div class="login-form">
+            <div class="form-group">
+                <label class="form-label">UTA NetID</label>
+                <input type="text" class="form-input" id="netId" placeholder="Enter your NetID">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="password" placeholder="Enter your password">
+            </div>
+            
+            <button class="login-btn" id="loginButton">Sign In</button>
+            
+            <div class="demo-credentials">
+                <h3>Demo Credentials:</h3>
+                <p><strong>NetID:</strong> jsmith123</p>
+                <p><strong>Password:</strong> (any)</p>
+            </div>
+        </div>
+        
+        <div class="login-footer">
+            <p>By signing in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+            <p class="mt-10">Need help? <a href="#">Contact UTA IT Support</a></p>
+        </div>
+    </div>
+    
+    <!-- App Page -->
+    <div class="container" id="appPage">
         <!-- Header -->
         <header>
             <div class="logo">
@@ -959,12 +1132,56 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            initLoginPage();
+        });
+
+        // Initialize login page
+        function initLoginPage() {
+            const loginButton = document.getElementById('loginButton');
+            const netIdInput = document.getElementById('netId');
+            const passwordInput = document.getElementById('password');
+            
+            loginButton.addEventListener('click', function() {
+                const netId = netIdInput.value.trim();
+                const password = passwordInput.value.trim();
+                
+                if (!netId) {
+                    showNotification("Please enter your NetID");
+                    return;
+                }
+                
+                // Simulate login process
+                loginButton.innerHTML = '<div class="spinner"></div> Signing In...';
+                loginButton.disabled = true;
+                
+                setTimeout(() => {
+                    // Successful login
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('appPage').style.display = 'block';
+                    
+                    // Initialize the app
+                    initApp();
+                    
+                    showNotification(`Welcome to NoCircles, ${netId}!`);
+                }, 1500);
+            });
+            
+            // Allow pressing Enter to login
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loginButton.click();
+                }
+            });
+        }
+
+        // Initialize the app after login
+        function initApp() {
             initMap();
             initEventListeners();
             renderParkingLots();
             renderLeaderboard();
             updateUserStats();
-        });
+        }
 
         // Initialize the map
         function initMap() {
