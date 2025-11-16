@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoCircles - UTA Smart Parking</title>
+    <title>NoCircles - AI-Powered Campus Parking</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
         :root {
@@ -32,9 +32,410 @@
         }
         
         body {
-            background-color: var(--gray-light);
+            background-color: var(--white);
             color: var(--gray-dark);
             line-height: 1.6;
+        }
+        
+        /* Landing Page Styles */
+        #landingPage {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+        
+        .landing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .landing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .landing-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .landing-logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .landing-nav {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .landing-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        .landing-nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero-section {
+            display: flex;
+            align-items: center;
+            min-height: 80vh;
+            padding: 40px 0;
+        }
+        
+        .hero-content {
+            flex: 1;
+            max-width: 600px;
+        }
+        
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .hero-image-placeholder {
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .hero-tagline {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            opacity: 0.8;
+            max-width: 500px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .problem-section {
+            background-color: var(--white);
+            color: var(--gray-dark);
+            padding: 100px 0;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+            color: var(--gray);
+        }
+        
+        .problem-stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--gray);
+        }
+        
+        .problem-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .problem-text {
+            flex: 1;
+        }
+        
+        .problem-image {
+            flex: 1;
+        }
+        
+        .problem-image-placeholder {
+            width: 100%;
+            height: 300px;
+            background-color: var(--gray-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+        }
+        
+        .features-section {
+            background-color: var(--gray-light);
+            padding: 100px 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .solution-section {
+            background-color: var(--white);
+            padding: 100px 0;
+        }
+        
+        .solution-steps {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1100px;
+            margin: 0 auto;
+            gap: 30px;
+        }
+        
+        .solution-step {
+            flex: 1;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        
+        .step-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .spot-navigation-section {
+            background-color: var(--primary);
+            color: white;
+            padding: 100px 0;
+        }
+        
+        .spot-navigation-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .spot-navigation-text {
+            flex: 1;
+        }
+        
+        .spot-navigation-image {
+            flex: 1;
+        }
+        
+        .spot-navigation-image-placeholder {
+            width: 100%;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .implementation-steps {
+            background-color: var(--gray-light);
+            padding: 80px 0;
+        }
+        
+        .steps-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .step-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 50px;
+            gap: 40px;
+        }
+        
+        .step-row:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-visual {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .step-visual-placeholder {
+            height: 200px;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            color: var(--gray);
+        }
+        
+        .step-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        /* App Styles */
+        #appPage {
+            display: none;
         }
         
         .container {
@@ -45,118 +446,6 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
             overflow-x: hidden;
-        }
-        
-        /* Login Page Styles */
-        #loginPage {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px 20px;
-            color: white;
-            text-align: center;
-        }
-        
-        .login-header {
-            margin-bottom: 40px;
-        }
-        
-        .uta-logo {
-            width: 120px;
-            height: 120px;
-            background-color: white;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .login-header h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        
-        .login-header p {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        
-        .login-form {
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary);
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        .form-input:focus {
-            border-color: var(--primary-light);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(74, 123, 196, 0.2);
-        }
-        
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        
-        .login-btn:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(214, 67, 48, 0.4);
-        }
-        
-        .login-footer {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-        
-        .login-footer a {
-            color: white;
-            text-decoration: underline;
-        }
-        
-        /* App Styles */
-        #appPage {
-            display: none;
         }
         
         /* Header Styles */
@@ -761,41 +1050,313 @@
             margin-bottom: 5px;
             font-size: 0.9rem;
         }
+        
+        /* Spot Navigation Feature */
+        .spot-navigation-feature {
+            background-color: var(--gray-light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .spot-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .spot {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .spot-available {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .spot-occupied {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .spot-reserved {
+            background-color: var(--warning);
+            color: var(--gray-dark);
+        }
+        
+        .spot-ev {
+            background-color: var(--primary-light);
+            color: white;
+        }
+        
+        .spot-accessible {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .spot:hover {
+            transform: scale(1.1);
+        }
+        
+        .spot-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+        
+        .navigate-btn {
+            width: 100%;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
-    <!-- Login Page -->
-    <div class="container" id="loginPage">
-        <div class="login-header">
-            <div class="uta-logo">UTA</div>
-            <h1>NoCircles</h1>
-            <p>Smart Parking for UTA Students</p>
+    <!-- Landing Page -->
+    <div id="landingPage">
+        <div class="landing-container">
+            <header class="landing-header">
+                <div class="landing-logo">
+                    <div class="landing-logo-icon">NC</div>
+                    <span>NoCircles</span>
+                </div>
+                <nav class="landing-nav">
+                    <a href="#problem">The Problem</a>
+                    <a href="#features">Features</a>
+                    <a href="#solution">Solution</a>
+                    <a href="#spotnav">Spot Navigation</a>
+                    <a href="#" id="launchAppBtn">Launch App</a>
+                </nav>
+            </header>
+            
+            <section class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-tagline">AI-Powered Parking Solution</div>
+                    <h1 class="hero-title">No More Circles.<br>Just Park.</h1>
+                    <div class="hero-subtitle">Eliminate campus parking chaos with real-time data, crowdsourced updates, and AI-powered predictions.</div>
+                    <p class="hero-description">Find parking faster at UTA and beyond. Join thousands of students who save 10-20 minutes daily with NoCircles.</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" id="getStartedBtn">Get Started</button>
+                        <button class="btn btn-secondary" id="signInBtn">Sign In</button>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-image-placeholder">Campus parking aerial view</div>
+                </div>
+            </section>
         </div>
         
-        <div class="login-form">
-            <div class="form-group">
-                <label class="form-label">UTA NetID</label>
-                <input type="text" class="form-input" id="netId" placeholder="Enter your NetID">
+        <section class="problem-section" id="problem">
+            <div class="landing-container">
+                <h2 class="section-title">The Problem</h2>
+                <p class="section-subtitle">Campus Parking is Broken</p>
+                
+                <div class="problem-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">10-20</span>
+                        <span class="stat-label">Minutes wasted daily</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">17K+</span>
+                        <span class="stat-label">Underutilized spaces</span>
+                    </div>
+                </div>
+                
+                <div class="problem-content">
+                    <div class="problem-text">
+                        <p>UTA's 17,000+ parking spaces are inefficiently utilized due to outdated systems and lack of real-time visibility.</p>
+                        <p class="mt-10">Students waste time circling for parking, leading to frustration, lost productivity, and higher emissions. Existing solutions fail to provide reliable, up-to-date availability.</p>
+                    </div>
+                    <div class="problem-image">
+                        <div class="problem-image-placeholder">Students on campus</div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-input" id="password" placeholder="Enter your password">
-            </div>
-            
-            <button class="login-btn" id="loginButton">Sign In</button>
-            
-            <div class="demo-credentials">
-                <h3>Demo Credentials:</h3>
-                <p><strong>NetID:</strong> jsmith123</p>
-                <p><strong>Password:</strong> (any)</p>
-            </div>
-        </div>
+        </section>
         
-        <div class="login-footer">
-            <p>By signing in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
-            <p class="mt-10">Need help? <a href="#">Contact UTA IT Support</a></p>
-        </div>
+        <section class="features-section" id="features">
+            <div class="landing-container">
+                <h2 class="section-title">Core Features</h2>
+                <p class="section-subtitle">Smart Parking, Powered by AI</p>
+                <p class="section-subtitle">NoCircles combines real-time data, community input, and predictive analytics to transform campus parking.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Real-Time Availability</h3>
+                        <p>Instant updates using live sensor feeds and crowdsourced data for accurate parking information.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h3 class="feature-title">Crowdsourced Validation</h3>
+                        <p>Gamified user input with "Car In/Out" tracking for community-driven accuracy and real-time updates.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3 class="feature-title">Predictive AI Model</h3>
+                        <p>AI forecasts parking availability for the next 15-60 minutes based on historical patterns and current data.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📍</div>
+                        <h3 class="feature-title">Smart Suggestions</h3>
+                        <p>Automatic rerouting to nearby lots when your destination is full, saving time and reducing frustration.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3 class="feature-title">Analytics Dashboard</h3>
+                        <p>Admin insights with data-driven planning tools for universities to optimize parking management.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">⏱️</div>
+                        <h3 class="feature-title">Time Savings</h3>
+                        <p>Eliminate 10-20 minutes of daily circling, reducing emissions and increasing productivity for students.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="solution-section" id="solution">
+            <div class="landing-container">
+                <h2 class="section-title">The Solution</h2>
+                <p class="section-subtitle">Hybrid Data Model</p>
+                <p class="section-subtitle">NoCircles uses a revolutionary hybrid approach, combining sensor feeds with community input to deliver the most accurate, live parking results on campus.</p>
+                
+                <div class="solution-steps">
+                    <div class="solution-step">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Real-Time Data</h3>
+                        <p>Sensor feeds provide baseline parking occupancy data across campus lots.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Community Input</h3>
+                        <p>Students contribute real-time updates through gamified Car In/Out tracking.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">AI Predictions</h3>
+                        <p>Machine learning forecasts availability and suggests optimal parking choices.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="spot-navigation-section" id="spotnav">
+            <div class="landing-container">
+                <h2 class="section-title">Spot-Level Navigation</h2>
+                <p class="section-subtitle">Navigate directly to specific parking spaces with GPS precision</p>
+                
+                <div class="spot-navigation-content">
+                    <div class="spot-navigation-text">
+                        <h3>Precision Parking Navigation</h3>
+                        <p>NoCircles goes beyond just showing available lots. Our advanced GPS mapping lets you navigate directly to individual parking spaces with 1-3 meter accuracy.</p>
+                        
+                        <div class="mt-10">
+                            <h4>How It Works:</h4>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>Each parking space has precise GPS coordinates</li>
+                                <li>Google Maps integration for turn-by-turn navigation</li>
+                                <li>Works for both outdoor lots and multi-level garages</li>
+                                <li>QR codes and floor plans for complex parking structures</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="spot-navigation-image">
+                        <div class="spot-navigation-image-placeholder">Spot-Level GPS Navigation Demo</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="implementation-steps">
+            <div class="steps-container">
+                <h2 class="section-title">Implementation Blueprint</h2>
+                <p class="section-subtitle">How we achieve spot-level navigation precision</p>
+                
+                <div class="step-row">
+                    <div class="step-content">
+                        <h3 class="step-title">Step 1: Assign Spot IDs</h3>
+                        <p>Every parking space gets a unique identifier (A1, A2, B1, etc.) across all UTA parking facilities.</p>
+                    </div>
+                    <div class="step-visual">
+                        <div class="step-visual-placeholder">Spot ID Assignment Visualization</div>
+                    </div>
+                </div>
+                
+                <div class="step-row">
+                    <div class="step-content">
+                        <h3 class="step-title">Step 2: Generate GPS Coordinates</h3>
+                        <p>Using GIS tools and high-resolution satellite imagery, we map precise coordinates for each parking space center point.</p>
+                    </div>
+                    <div class="step-visual">
+                        <div class="step-visual-placeholder">GPS Coordinate Mapping</div>
+                    </div>
+                </div>
+                
+                <div class="step-row">
+                    <div class="step-content">
+                        <h3 class="step-title">Step 3: Database Integration</h3>
+                        <p>All spot data is stored in our real-time database with occupancy status, updated by both sensors and user reports.</p>
+                    </div>
+                    <div class="step-visual">
+                        <div class="step-visual-placeholder">Database Schema</div>
+                    </div>
+                </div>
+                
+                <div class="step-row">
+                    <div class="step-content">
+                        <h3 class="step-title">Step 4: Navigation Integration</h3>
+                        <p>When a user selects a spot, we generate a Google Maps deep link with the exact coordinates for turn-by-turn navigation.</p>
+                    </div>
+                    <div class="step-visual">
+                        <div class="step-visual-placeholder">Google Maps Integration</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="cta-section">
+            <div class="landing-container">
+                <h2 class="cta-title">Ready to Stop Circling?</h2>
+                <p>Join the NoCircles revolution and transform your campus parking experience. Try our demo or explore the admin dashboard.</p>
+                
+                <div class="cta-buttons">
+                    <button class="btn btn-primary" id="tryStudentAppBtn">Try Student App</button>
+                    <button class="btn btn-secondary" id="viewAdminDashboardBtn">View Admin Dashboard</button>
+                </div>
+            </div>
+        </section>
     </div>
     
     <!-- App Page -->
@@ -813,6 +1374,7 @@
         <nav>
             <div class="nav-item active" data-tab="map">Map</div>
             <div class="nav-item" data-tab="lots">Lots</div>
+            <div class="nav-item" data-tab="spots">Spots</div>
             <div class="nav-item" data-tab="predictions">Predictions</div>
             <div class="nav-item" data-tab="community">Community</div>
         </nav>
@@ -849,6 +1411,14 @@
                     </button>
                 </div>
                 
+                <!-- AI Prediction Banner -->
+                <div class="predictions">
+                    <div class="prediction-item">
+                        <div class="prediction-time">AI Prediction</div>
+                        <div class="prediction-status">West Garage will fill in 30 mins</div>
+                    </div>
+                </div>
+                
                 <!-- Filters -->
                 <div class="filters">
                     <h2 class="section-title">Filters</h2>
@@ -866,6 +1436,65 @@
                     <h2 class="section-title">Parking Lots</h2>
                     <div id="lotsList">
                         <!-- Lots will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Spots Section -->
+            <div class="tab-content" id="spots-tab">
+                <div class="section-title">
+                    <h2>Available Parking Spots</h2>
+                    <span style="font-size: 0.9rem; font-weight: normal;">West Campus Garage</span>
+                </div>
+                
+                <div class="spot-navigation-feature">
+                    <h3 style="margin-bottom: 15px;">Level 1 - Select a Spot</h3>
+                    
+                    <div class="spot-grid" id="spotGrid">
+                        <!-- Spots will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="spot-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot spot-available"></div>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot spot-occupied"></div>
+                            <span>Occupied</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot spot-reserved"></div>
+                            <span>Reserved</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot spot-ev"></div>
+                            <span>EV Charging</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot spot-accessible"></div>
+                            <span>Accessible</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary navigate-btn" id="navigateToSpotBtn" disabled>
+                        <i>📍</i> Navigate to Selected Spot
+                    </button>
+                </div>
+                
+                <div class="predictions">
+                    <h3>Garage Information</h3>
+                    <div class="prediction-item">
+                        <div class="prediction-time">Total Spaces</div>
+                        <div class="prediction-status">250 spots</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-time">Available Now</div>
+                        <div class="prediction-status">42 spots</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-time">EV Charging</div>
+                        <div class="prediction-status">8 spots (2 available)</div>
                     </div>
                 </div>
             </div>
@@ -942,6 +1571,10 @@
                 <i>🗺️</i>
                 <span>Map</span>
             </div>
+            <div class="nav-icon" data-tab="spots">
+                <i>📍</i>
+                <span>Spots</span>
+            </div>
             <div class="nav-icon" data-tab="predictions">
                 <i>📊</i>
                 <span>Predict</span>
@@ -953,6 +1586,37 @@
             <div class="nav-icon" data-tab="settings">
                 <i>⚙️</i>
                 <span>Settings</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Sign In to NoCircles</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">UTA NetID</label>
+                    <input type="text" class="form-input" id="netId" placeholder="Enter your NetID">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="password" placeholder="Enter your password">
+                </div>
+                
+                <div class="demo-credentials">
+                    <h3>Demo Credentials:</h3>
+                    <p><strong>NetID:</strong> jsmith123</p>
+                    <p><strong>Password:</strong> (any)</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <button class="btn btn-primary" id="confirmLogin">Sign In</button>
             </div>
         </div>
     </div>
@@ -1031,6 +1695,28 @@
         </div>
     </div>
     
+    <!-- Spot Navigation Modal -->
+    <div class="modal" id="spotNavigationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Navigate to Parking Spot</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <p>You've selected <strong id="selectedSpotId">A42</strong></p>
+                <p class="mt-10">Opening Google Maps for turn-by-turn navigation to your exact parking spot.</p>
+                <div class="demo-credentials">
+                    <p><strong>GPS Coordinates:</strong> 32.7291187, -97.1148812</p>
+                    <p><strong>Accuracy:</strong> 1-3 meters</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=32.7291187,-97.1148812" target="_blank" class="btn btn-primary" id="openMapsBtn">Open Google Maps</a>
+            </div>
+        </div>
+    </div>
+    
     <!-- Notification -->
     <div class="notification" id="notification">
         <span id="notificationText">Notification message</span>
@@ -1038,7 +1724,7 @@
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
-        // Parking lot data
+        // Enhanced parking lot data with spot-level information
         const parkingLots = [
             {
                 id: 1,
@@ -1051,7 +1737,8 @@
                 distance: "0.3 miles",
                 walkTime: "5 min walk",
                 filters: ["all", "permit-a"],
-                prediction: "Filling up in 30 mins"
+                prediction: "Filling up in 30 mins",
+                spots: generateParkingSpots(42, 8, 4, 3)
             },
             {
                 id: 2,
@@ -1064,7 +1751,8 @@
                 distance: "0.5 miles",
                 walkTime: "8 min walk",
                 filters: ["all", "permit-b"],
-                prediction: "Will be full in 1 hour"
+                prediction: "Will be full in 1 hour",
+                spots: generateParkingSpots(5, 2, 1, 1)
             },
             {
                 id: 3,
@@ -1077,7 +1765,8 @@
                 distance: "0.2 miles",
                 walkTime: "4 min walk",
                 filters: ["all", "permit-a"],
-                prediction: "Stays full until 3 PM"
+                prediction: "Stays full until 3 PM",
+                spots: generateParkingSpots(0, 0, 0, 0)
             },
             {
                 id: 4,
@@ -1090,7 +1779,8 @@
                 distance: "0.7 miles",
                 walkTime: "12 min walk",
                 filters: ["all", "permit-b", "ev"],
-                prediction: "Stays available all day"
+                prediction: "Stays available all day",
+                spots: generateParkingSpots(15, 3, 2, 2)
             },
             {
                 id: 5,
@@ -1103,7 +1793,8 @@
                 distance: "0.4 miles",
                 walkTime: "7 min walk",
                 filters: ["all", "accessible"],
-                prediction: "Gradually fills by noon"
+                prediction: "Gradually fills by noon",
+                spots: generateParkingSpots(30, 5, 3, 2)
             }
         ];
 
@@ -1129,21 +1820,106 @@
         let markers = [];
         let currentFilter = "all";
         let userLocation = null;
+        let selectedSpot = null;
+
+        // Generate parking spots for demo
+        function generateParkingSpots(available, ev, accessible, reserved) {
+            const spots = [];
+            let id = 1;
+            
+            // Add available regular spots
+            for (let i = 0; i < available; i++) {
+                spots.push({
+                    id: `A${id++}`,
+                    status: "available",
+                    type: "regular",
+                    coordinates: generateRandomCoordinates(32.7310, -97.1150, 0.001)
+                });
+            }
+            
+            // Add EV spots
+            for (let i = 0; i < ev; i++) {
+                spots.push({
+                    id: `EV${id++}`,
+                    status: Math.random() > 0.5 ? "available" : "occupied",
+                    type: "ev",
+                    coordinates: generateRandomCoordinates(32.7310, -97.1150, 0.001)
+                });
+            }
+            
+            // Add accessible spots
+            for (let i = 0; i < accessible; i++) {
+                spots.push({
+                    id: `AC${id++}`,
+                    status: Math.random() > 0.7 ? "available" : "occupied",
+                    type: "accessible",
+                    coordinates: generateRandomCoordinates(32.7310, -97.1150, 0.001)
+                });
+            }
+            
+            // Add reserved spots
+            for (let i = 0; i < reserved; i++) {
+                spots.push({
+                    id: `R${id++}`,
+                    status: "reserved",
+                    type: "regular",
+                    coordinates: generateRandomCoordinates(32.7310, -97.1150, 0.001)
+                });
+            }
+            
+            // Fill with occupied spots
+            const occupiedCount = 25 - spots.length;
+            for (let i = 0; i < occupiedCount; i++) {
+                spots.push({
+                    id: `A${id++}`,
+                    status: "occupied",
+                    type: "regular",
+                    coordinates: generateRandomCoordinates(32.7310, -97.1150, 0.001)
+                });
+            }
+            
+            return spots.sort(() => Math.random() - 0.5);
+        }
+
+        // Generate random coordinates near a center point
+        function generateRandomCoordinates(lat, lng, range) {
+            return {
+                lat: lat + (Math.random() - 0.5) * range,
+                lng: lng + (Math.random() - 0.5) * range
+            };
+        }
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            initLoginPage();
+            initLandingPage();
         });
 
-        // Initialize login page
-        function initLoginPage() {
-            const loginButton = document.getElementById('loginButton');
-            const netIdInput = document.getElementById('netId');
-            const passwordInput = document.getElementById('password');
+        // Initialize landing page
+        function initLandingPage() {
+            // Landing page buttons
+            document.getElementById('getStartedBtn').addEventListener('click', function() {
+                document.getElementById('loginModal').style.display = 'flex';
+            });
             
-            loginButton.addEventListener('click', function() {
-                const netId = netIdInput.value.trim();
-                const password = passwordInput.value.trim();
+            document.getElementById('signInBtn').addEventListener('click', function() {
+                document.getElementById('loginModal').style.display = 'flex';
+            });
+            
+            document.getElementById('launchAppBtn').addEventListener('click', function() {
+                document.getElementById('loginModal').style.display = 'flex';
+            });
+            
+            document.getElementById('tryStudentAppBtn').addEventListener('click', function() {
+                document.getElementById('loginModal').style.display = 'flex';
+            });
+            
+            document.getElementById('viewAdminDashboardBtn').addEventListener('click', function() {
+                showNotification("Admin dashboard feature coming soon!");
+            });
+            
+            // Login functionality
+            document.getElementById('confirmLogin').addEventListener('click', function() {
+                const netId = document.getElementById('netId').value.trim();
                 
                 if (!netId) {
                     showNotification("Please enter your NetID");
@@ -1151,13 +1927,14 @@
                 }
                 
                 // Simulate login process
-                loginButton.innerHTML = '<div class="spinner"></div> Signing In...';
-                loginButton.disabled = true;
+                document.getElementById('confirmLogin').innerHTML = '<div class="spinner"></div> Signing In...';
+                document.getElementById('confirmLogin').disabled = true;
                 
                 setTimeout(() => {
                     // Successful login
-                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('landingPage').style.display = 'none';
                     document.getElementById('appPage').style.display = 'block';
+                    document.getElementById('loginModal').style.display = 'none';
                     
                     // Initialize the app
                     initApp();
@@ -1166,10 +1943,34 @@
                 }, 1500);
             });
             
-            // Allow pressing Enter to login
-            passwordInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    loginButton.click();
+            // Close modals
+            const closeButtons = document.querySelectorAll('.close-modal');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    document.getElementById('loginModal').style.display = 'none';
+                    document.getElementById('carInModal').style.display = 'none';
+                    document.getElementById('carOutModal').style.display = 'none';
+                    document.getElementById('confirmationModal').style.display = 'none';
+                    document.getElementById('spotNavigationModal').style.display = 'none';
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === document.getElementById('loginModal')) {
+                    document.getElementById('loginModal').style.display = 'none';
+                }
+                if (event.target === document.getElementById('carInModal')) {
+                    document.getElementById('carInModal').style.display = 'none';
+                }
+                if (event.target === document.getElementById('carOutModal')) {
+                    document.getElementById('carOutModal').style.display = 'none';
+                }
+                if (event.target === document.getElementById('confirmationModal')) {
+                    document.getElementById('confirmationModal').style.display = 'none';
+                }
+                if (event.target === document.getElementById('spotNavigationModal')) {
+                    document.getElementById('spotNavigationModal').style.display = 'none';
                 }
             });
         }
@@ -1179,6 +1980,7 @@
             initMap();
             initEventListeners();
             renderParkingLots();
+            renderParkingSpots();
             renderLeaderboard();
             updateUserStats();
         }
@@ -1253,8 +2055,51 @@
                 <div class="popup-actions">
                     <button class="popup-btn primary" onclick="reportCarIn(${lot.id})">Car In</button>
                     <button class="popup-btn secondary" onclick="reportCarOut(${lot.id})">Car Out</button>
+                    <button class="popup-btn primary" onclick="switchToSpotsTab()">View Spots</button>
                 </div>
             `;
+        }
+
+        // Switch to spots tab
+        function switchToSpotsTab() {
+            switchTab('spots');
+        }
+
+        // Render parking spots
+        function renderParkingSpots() {
+            const spotGrid = document.getElementById('spotGrid');
+            spotGrid.innerHTML = '';
+            
+            const westCampusGarage = parkingLots.find(lot => lot.id === 1);
+            if (!westCampusGarage) return;
+            
+            // Show first 25 spots for demo
+            const displaySpots = westCampusGarage.spots.slice(0, 25);
+            
+            displaySpots.forEach(spot => {
+                const spotElement = document.createElement('div');
+                spotElement.className = `spot spot-${spot.status} ${spot.type !== 'regular' ? 'spot-' + spot.type : ''}`;
+                spotElement.textContent = spot.id;
+                spotElement.title = `Spot ${spot.id} - ${spot.status} - ${spot.type}`;
+                
+                spotElement.addEventListener('click', function() {
+                    if (spot.status === 'available') {
+                        // Deselect previously selected spot
+                        document.querySelectorAll('.spot').forEach(s => {
+                            s.style.boxShadow = 'none';
+                        });
+                        
+                        // Select this spot
+                        spotElement.style.boxShadow = '0 0 0 3px var(--primary)';
+                        selectedSpot = spot;
+                        document.getElementById('navigateToSpotBtn').disabled = false;
+                    } else {
+                        showNotification(`Spot ${spot.id} is ${spot.status}`);
+                    }
+                });
+                
+                spotGrid.appendChild(spotElement);
+            });
         }
 
         // Initialize event listeners
@@ -1297,6 +2142,18 @@
                 });
             });
             
+            // Navigate to spot button
+            document.getElementById('navigateToSpotBtn').addEventListener('click', function() {
+                if (selectedSpot) {
+                    document.getElementById('selectedSpotId').textContent = selectedSpot.id;
+                    document.getElementById('spotNavigationModal').style.display = 'flex';
+                    
+                    // Update Google Maps link with actual coordinates
+                    const mapsBtn = document.getElementById('openMapsBtn');
+                    mapsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${selectedSpot.coordinates.lat},${selectedSpot.coordinates.lng}`;
+                }
+            });
+            
             // Filter chips
             const filterChips = document.querySelectorAll('.filter-chip');
             
@@ -1315,12 +2172,10 @@
             // Modal functionality
             const carInModal = document.getElementById('carInModal');
             const carOutModal = document.getElementById('carOutModal');
-            const confirmationModal = document.getElementById('confirmationModal');
             const carInBtn = document.getElementById('carInBtn');
             const carOutBtn = document.getElementById('carOutBtn');
             const confirmCarIn = document.getElementById('confirmCarIn');
             const confirmCarOut = document.getElementById('confirmCarOut');
-            const closeButtons = document.querySelectorAll('.close-modal');
             
             // Populate lot select options
             const carInLotSelect = document.getElementById('carInLotSelect');
@@ -1375,28 +2230,6 @@
                 reportCarOut(selectedLotId);
             });
             
-            // Close modals
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    carInModal.style.display = 'none';
-                    carOutModal.style.display = 'none';
-                    confirmationModal.style.display = 'none';
-                });
-            });
-            
-            // Close modal when clicking outside
-            window.addEventListener('click', function(event) {
-                if (event.target === carInModal) {
-                    carInModal.style.display = 'none';
-                }
-                if (event.target === carOutModal) {
-                    carOutModal.style.display = 'none';
-                }
-                if (event.target === confirmationModal) {
-                    confirmationModal.style.display = 'none';
-                }
-            });
-            
             // User profile click
             document.getElementById('userProfile').addEventListener('click', function() {
                 showNotification(`Logged in as ${userData.name}`);
@@ -1420,6 +2253,15 @@
                 setTimeout(() => {
                     map.invalidateSize();
                 }, 300);
+            }
+            
+            // Reset spot selection when switching away from spots tab
+            if (tabName !== 'spots') {
+                selectedSpot = null;
+                document.getElementById('navigateToSpotBtn').disabled = true;
+                document.querySelectorAll('.spot').forEach(spot => {
+                    spot.style.boxShadow = 'none';
+                });
             }
         }
 
@@ -1563,7 +2405,7 @@
             }, 1000);
         }
 
-        // Report car out
+        //It should report the car is clocking out
         function reportCarOut(lotId) {
             const lot = parkingLots.find(l => l.id === lotId);
             if (!lot) return;
